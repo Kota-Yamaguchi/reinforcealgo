@@ -5,8 +5,8 @@ import random
 import numpy as np
 class Agent():
     def __init__(self, status: Status):
-        self.status = status
-    
+        self.status :Status = status
+        self.next_status :Status = Status()
 
     @staticmethod
     def actions() -> list:
@@ -18,18 +18,34 @@ class Agent():
     def _one_step(self, action:int, environment: Environment) -> bool:
         probs :list = environment.transit_function(action)
         selected_action = np.random.choice(self.actions(), p = probs)
-
+        print("agent select action : "+ str(selected_action))
         # ここ間違っている。next_stateを用意してそれでゴールかどうかの判定を実施してください
+         #次に移動するマスの計算
+        
+        if (selected_action==Action.UP):
+            self.next_status.row_position = self.status.row_position + 1
+        if (selected_action==Action.DOWN):
+            self.next_status.row_position = self.status.row_position + -1
+        if selected_action==Action.RIGHT:
+            self.next_status.column_position  = self.status.column_position + 1
+        if selected_action==Action.LEFT:
+            self.next_status.column_position  =  self.status.column_position + -1
 
-        if environment.can_action_at(action, self.status):
-            self.status.update_status(selected_action)
+        
+        print("go next position "+str(self.next_status)+" ?")
+
+        if environment.can_action_at(self.next_status):
+            self.status.copy_status(self.next_status)
+            print("go next position")
             return False
         else:
-            if environment.is_goal(self.status):
-                
+            if environment.is_goal(self.next_status):
+                self.status.copy_status(self.next_status)
                 print("reach goal")
                 return True
-            
+            else:
+                self.next_status.copy_status(self.status)
+                print("can't go the direction")
         return False
 
 
@@ -38,16 +54,15 @@ class Agent():
         done : bool = False
         while not done:
             action = self.move_by_policy()
-            print("agent select action : "+ str(action))
-            print(done)
+            
             done = self._one_step(action, env)
             env.calc_reward(self.status)
             
-            print(self.status, done)
+            print(self.status, env.reward)
         
 
         print("Complete")
-
+        print("your reward is {}".format(env.reward))
 
 
             

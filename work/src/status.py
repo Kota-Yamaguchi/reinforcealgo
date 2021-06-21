@@ -27,12 +27,10 @@ class Status():
             self.column_position += -1
         
 
-    def set_column_position(self, column_position):
-        self.column_position = column_position
+    def copy_status(self, status : "Status"):
+        self.column_position = status.column_position
+        self.row_position = status.row_position
         
-    def set_row_position(self, row_position):
-        self.row_position = row_position
-
     def __str__(self):
         return "your position :"+ str(self.row_position)+","+str(self.column_position) 
 

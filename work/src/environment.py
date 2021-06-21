@@ -12,39 +12,34 @@ class Environment():
         self.reward = 0
         self.move_prob = 0.8
 
-    def can_action_at(self, action: int, status: Status) -> bool:
-        
+    def can_action_at(self, status: Status) -> bool:
+        #マス目の端からはとびだせない
+        if status.column_position <0:
+            return False
+        if status.row_position  <0:
+            return False
+        if status.column_position > self.column-1:
+            return False
+        if status.row_position > self.row -1:
+            return False
         #何かの報酬があるマスの時に動けない
         if self.grid[status.row_position][status.column_position] != 0:
             return False
         
-        #次に移動するマスの計算
-        next_row : int = 0
-        next_column : int = 0
-        
-        if (action==Action.UP):
-            next_row = status.row_position + 1
-        if (action==Action.DOWN):
-            next_row = status.row_position + -1
-
-        if action==Action.RIGHT:
-            next_column = status.column_position + 1
-        if action==Action.LEFT:
-            next_column =  status.column_position + -1
-
-        #マス目の端からはとびだせない
-        if next_column <0:
-            return False
-        if next_row  <0:
-            return False
-        if next_column > self.column:
-            return False
-        if next_row > self.row :
-            return False
 
         return True
 
     def is_goal(self, status : Status) -> bool:
+        #マス目の端からはとびだせない
+        if status.column_position <0:
+            return False
+        if status.row_position  <0:
+            return False
+        if status.column_position > self.column-1:
+            return False
+        if status.row_position > self.row -1:
+            return False
+
         value :int = self.grid[status.row_position][status.column_position]
         print("is goal ?")
         if value == 1:
@@ -70,7 +65,7 @@ class Environment():
                
             else:
                 probs.append(0)
-        print(probs)
+        
         return probs
 
     def calc_reward(self, status:Status) -> float:
