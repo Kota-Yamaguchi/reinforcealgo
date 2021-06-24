@@ -28,7 +28,8 @@
 	"extensions": [
 		"ms-python.python",
 		"ms-pyright.pyright",
-		"tabnine.tabnine-vscode"
+		"tabnine.tabnine-vscode",
+		"ms-python.vscode-pylance"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
