@@ -4,7 +4,7 @@ from status import Status, Action
 import numpy as np
 from Agent import Agent 
 
-class Environment():
+class EnvironmentImpl():
     def __init__(self, grid : list, agent : Agent, move_prob =0.8):
         self.default_rewarding = -0.04
         self.grid = grid
@@ -112,11 +112,19 @@ class Environment():
         return False
 
     def iterative_policy(self):
-        pi = np.random.randint(0, len(self.agent.actions), (self.row, self.column))
-
-    def calc_iterative_state_value(self,gamma : float = 0.9):
-        count = 0
+        pi = np.random.randint(0, len(self.agent.actions()), (self.row, self.column))
         value_grid = np.zeros((len(self.grid), len(self.grid[0])))
+        is_policy_stable : bool = False
+        while not is_policy_stable:
+        
+            value_grid = self.calc_iterative_state_value(value_grid, pi)
+            is_policy_stable = self.calc_policy_improvement(value_grid, pi)
+
+        return pi, value_grid
+
+    def calc_iterative_state_value(self,value_grid, pi, gamma : float = 0.9):
+        count = 0
+        
         actions = self.agent.actions()
         while(True):
             delta = 0
@@ -124,17 +132,18 @@ class Environment():
                 for j in range(len(self.grid[0])):
                     tmp = 0
                     tmp_v = value_grid[i][j]
-                    for action in actions:
-                        self.agent.state.set_status(i, j)
-                        next_state : Status= self.move_next_state(action, self.agent.state)
+                    action = actions[pi[i][j]]
+                    self.agent.state.set_status(i, j)
+                    next_state : Status= self.move_next_state(action, self.agent.state)
+                    
+                    done = self.can_action_at(next_state)
+                    if not done:
+                        tmp += self.calc_reward(next_state)
+                        continue
+                    else:
                         reward : float = self.calc_reward(next_state)
-                        pi = self.agent.pi(action)
-                        done = self.can_action_at(next_state)
-                        if not done:
-                            tmp +=  pi * self.calc_reward(next_state)
-                            continue
                         V_pi = gamma * value_grid[next_state.row_position][next_state.column_position] 
-                        tmp += pi *(reward + V_pi )
+                        tmp = (reward + V_pi )
                     value_grid[i][j] = tmp
                     delta = max(delta , abs(tmp_v - value_grid[i][j]))
             count +=1
@@ -143,9 +152,9 @@ class Environment():
                 break
         return value_grid
 
-    def calc_policy_improvement(self, value_grid,gamma : float = 0.9):
+    def calc_policy_improvement(self, value_grid,pi, gamma : float = 0.9) ->bool :
         actions = self.agent.actions()
-    
+        b = pi.copy()
         for i in range(len(self.grid)):
             for j in range(len(self.grid[0])):
                 tmp = np.zeros(len(actions))
@@ -159,7 +168,12 @@ class Environment():
                         continue
                     V_pi = gamma * value_grid[next_state.row_position][next_state.column_position] 
                     tmp[index] = (reward + V_pi )
-                
+                pi[i, j] = np.argmax(tmp)
+        if (np.all(b == pi)):
+            print("policy stable")
+            return True
+        return False
+        
 
 
     def calc_recursive_state_value(self):

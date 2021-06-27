@@ -15,17 +15,10 @@ class Status():
         self.column_position =0
     
     
-    def update_status(self, action) -> None:
-        if (action==Action.UP):
-            self.row_position += 1
-        if (action==Action.DOWN):
-            self.row_position += -1
-
-        if action==Action.RIGHT :
-            self.column_position += 1
-        if action==Action.LEFT:
-            self.column_position += -1
-        
+    def set_status(self, row, column) -> None:
+        self.row_position = row
+        self.column_position = column
+    
 
     def copy_status(self, status : "Status"):
         self.column_position = status.column_position

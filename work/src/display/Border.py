@@ -1,4 +1,4 @@
-from Display import Display
+from display.Display import Display
 from abc import ABC
 
 class Border(Display):
@@ -45,3 +45,25 @@ class GridBorders(Border):
         
         return text
 
+class DirectionBorders(Border):
+    def __init__(self, display : Display):
+        super().__init__(display)
+
+    def getRows(self) -> int:
+        return self.display.getRows()
+
+    def getColumns(self) -> int:
+        return self.display.getColumns()
+
+
+    def getRowText(self, i : int, j : int ) -> str: 
+        
+        if self.display.getRowText(i, j) == "0":
+            return "↓"
+        if self.display.getRowText(i, j) == "1":
+            return "↑"
+        if self.display.getRowText(i, j) == "2":
+            return "→"
+        if self.display.getRowText(i, j) == "3":
+            return "←"
+        
